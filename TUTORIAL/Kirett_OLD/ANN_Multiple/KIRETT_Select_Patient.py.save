@@ -1,0 +1,39 @@
+from tvm.driver import tvmc
+import numpy as np
+import pandas as pd
+import time
+
+model = tvmc.load('/home/xilinx/tvm/vta/Kirett/ANN_Multiple/ANN-model.h5')
+
+###
+# file = 'oneperson.xlsx'
+file = '/home/xilinx/tvm/vta/Kirett/ANN_Multiple/10persons.xlsx'
+df = pd.read_excel(file)
+
+df = df.fillna(0)
+df = df.iloc[:, 1:46]
+y = df.iloc[:, -1]
+X = df.iloc[:, :-1]
+X = np.asarray(X).astype(np.float64)
+
+###
+
+###
+X_column = X.shape[0]
+X_all = np.vsplit(X, X_column)
+
+# the person you want to predict
+Person_number = 1
+Person_in_column = Person_number - 1
+input_1 = X_all[Person_in_column]
+###
+
+#tvmc.tune(model, target="llvm", tuning_records="model.log",)
+start1 = time.time()
+package = tvmc.compile(model, target="llvm", tuning_records="model.log")
+#package = tvmc.compile(model, target="llvm")
+result = tvmc.run(package, device="cpu", inputs={'input_1':input_1})
+end1 = time.time()
+print('Predict Execution Time: ',end1 - start1, 's')
+print('result: \n', result)
+print(result.outputs['outp
