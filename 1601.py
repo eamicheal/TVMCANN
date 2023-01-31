@@ -14,7 +14,7 @@ from torch import nn
 import tvm
 from tvm import relay
 
-file = '10persons.xlsx'
+file = '/home/xilinx/tvm/vta/Zhang/10persons.xlsx'
 df = pd.read_excel(file)
 
 df = df.fillna(0)
